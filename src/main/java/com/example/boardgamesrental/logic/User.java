@@ -9,4 +9,17 @@ public class User {
         this.id = ++maxID;
         this.username = username;
     }
+    public User(String username, int id) {
+        this.id = id;
+        if (maxID < id) maxID = id;
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public int getId() {
+        return id;
+    }
 }

@@ -6,6 +6,10 @@ public class Admin extends User{
         super(username);
     }
 
+    public Admin(String username, int id) {
+        super(username, id);
+    }
+
     public boolean addGame(String gameName, int price, int stocked, String desc){
         return false;
     }

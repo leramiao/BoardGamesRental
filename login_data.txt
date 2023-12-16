@@ -1,0 +1,4 @@
+1:kulturalny czlowiek:gramwgry:0
+2:bomba:uuu:0
+3:trzeci:3:0
+4:nowy:4:0

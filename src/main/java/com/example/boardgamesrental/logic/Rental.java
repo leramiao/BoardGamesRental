@@ -6,23 +6,23 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class Rental {
 
     private static final String GAME_DATA_FILE = "games_data.txt";
+    private static final String LOGIN_DATA_FILE = "login_data.txt";
 
     private List<User> userList;
+    private User activeUser;
     private List<BoardGame> gameList;
 
     public Rental() {
         userList = new ArrayList<>();
+        loadUserData();
         gameList = new ArrayList<>();
         loadGameData();
 
     }
-
-
 
     private boolean isNameTaken(String gameName){
         for (BoardGame g : gameList){
@@ -39,15 +39,65 @@ public class Rental {
         BoardGame game = new BoardGame(gameName, price, stocked, desc);
         return gameList.add(game);
     }
+    public int addCustomer(String username){
+        User user = new Customer(username);
+        userList.add(user);
+        return user.getId();
+    }
 
-    public boolean signUp(String username, String password){
-        return false;
+    public boolean signUp(String username, String password){ //tylko customer ofc
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(LOGIN_DATA_FILE));
+            List<String> lines = reader.lines().toList();
+            for (String line : lines){
+                if (line.split(":")[1].equals(username)){ //is username taken
+                    return false; //trzeba bedzie dodac custom exceptions
+                }
+            }
+            reader.close();
+
+            int userID = addCustomer(username);
+            BufferedWriter writer = new BufferedWriter(new FileWriter(LOGIN_DATA_FILE, true));
+            String userData = userID + ":" + username + ":" + password + ":" + "0\n"; //0 - customer perms
+            writer.write(userData);
+            writer.close();
+
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
+        return true;
     }
     public User login(String username, String password){
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(LOGIN_DATA_FILE));
+            List<String> lines = reader.lines().toList();
+            String[] userData;
+            for (String line : lines){
+                userData = line.split(":");//id:username:password:perms
+                if (userData[1].equals(username) && userData[2].equals(password)){
+                    if (userData[3].equals("1")){
+                        activeUser = new Admin(username, Integer.parseInt(userData[0]));
+                    }
+                    else if (userData[3].equals("0")){
+                        activeUser = new Customer(username, Integer.parseInt(userData[0]));
+                    }
+                    else {
+                        return null; //cant read perms, throw smth
+                    }
+                    return activeUser;
+                }
+            }
+            reader.close();
+
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+            return null;
+        }
         return null;
     }
     public void logout(){
-
+        activeUser = null;
     }
     public boolean saveGameData(){ //w celach testowania, ew. private
         System.out.println("saving mode.. " + gameList.size() + " games to save");
@@ -91,5 +141,56 @@ public class Rental {
 
     public List<BoardGame> getGameList() { //w celach testowania, moze usune pozniej
         return gameList;
+    }
+
+    public User getActiveUser() { //w celach testowania
+        return activeUser;
+    }
+
+    public boolean loadUserData(){
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(LOGIN_DATA_FILE));
+            List<String> lines = reader.lines().toList();
+            String[] userData;
+            User iterUser;
+            for (String line : lines){
+                userData = line.split(":");//id:username:password:perms
+                if (userData[3].equals("1")){
+                    iterUser = new Admin(userData[1], Integer.parseInt(userData[0]));
+                }
+                else if (userData[3].equals("0")){
+                    iterUser = new Customer(userData[1], Integer.parseInt(userData[0]));
+                }
+                else {
+                    return false; //cant read perms, throw smth
+                }
+                userList.add(iterUser);
+
+            }
+            reader.close();
+
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    public boolean saveUserData(){
+        /*
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(LOGIN_DATA_FILE, true));
+            String userData;
+            for (User user : userList){
+                userData = user.getId() + ":" + user.getUsername() + ":" + password + ":" + "0\n"; //0 - customer perms
+            }
+            writer.write(userData);
+            writer.close();
+
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+            return false;
+        }*/
+        return false;
     }
 }

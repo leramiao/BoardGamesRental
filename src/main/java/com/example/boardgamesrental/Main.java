@@ -11,9 +11,14 @@ public class Main {
     public static void main(String[] args) {
         scanner = new Scanner(System.in);
         rental = new Rental();
+        //juz wpisane
         //rental.getGameList().add(new BoardGame("monopoly", 2,10, "wesola gra monopolia!!!!!!"));
         //rental.getGameList().add(new BoardGame("monopoly2", 200,10, "mega wesola gra monopolia 2!"));
         System.out.println(rental.saveGameData());
+        signupDialog();
+        loginDialog();
+        System.out.println(rental.getActiveUser().getUsername() + " is active");
+        rental.logout();
     }
 
     public static void loginDialog(){
