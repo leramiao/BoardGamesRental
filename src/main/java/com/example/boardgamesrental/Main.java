@@ -20,7 +20,6 @@ public class Main extends Application {
     private static Scanner scanner;
     private static Rental rental;
     public static void main(String[] args) {
-        //scanner = new Scanner(System.in);
         rental = new Rental();
         launch(args);
         //juz wpisane
